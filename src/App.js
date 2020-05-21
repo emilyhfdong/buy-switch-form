@@ -1,40 +1,26 @@
 import React, { useState } from "react"
 import tomNook from "./tom-nook.png"
 import "./App.css"
-import firebase from "firebase"
+import axios from "axios"
 
-const re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
-
-const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: "buy-switch.firebaseapp.com",
-  databaseURL: "https://buy-switch.firebaseio.com",
-  projectId: "buy-switch",
-  storageBucket: "buy-switch.appspot.com",
-  messagingSenderId: process.env.REACT_APP_FIREBASE_SENDER_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID,
-  measurementId: process.env.REACT_APP_MEASUREMENT_ID,
-}
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig)
-firebase.analytics()
+const re = /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i
 
 const App = () => {
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isDone, setIsDone] = useState(false)
   const [hasError, setHasError] = useState(false)
-  const emailIsValid = !re.test(email)
+  const emailIsValid = re.test(email)
   const submit = async () => {
     if (emailIsValid) {
       setIsLoading(true)
       setHasError(false)
       try {
-        const db = firebase.firestore()
-        await db.collection("users").add({
-          email,
-        })
+        await axios.post(
+          "https://buy-switch-scrapper.herokuapp.com/emails",
+          { email },
+          { headers: { "Content-Type": "application/json" } }
+        )
         setIsDone(true)
       } catch (e) {
         console.log("error", e)
