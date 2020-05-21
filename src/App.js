@@ -25,20 +25,23 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isDone, setIsDone] = useState(false)
   const [hasError, setHasError] = useState(false)
+  const emailIsValid = !re.test(email)
   const submit = async () => {
-    setIsLoading(true)
-    setHasError(false)
-    try {
-      const db = firebase.firestore()
-      await db.collection("users").add({
-        email,
-      })
-      setIsDone(true)
-    } catch (e) {
-      console.log("error", e)
-      setHasError(true)
+    if (emailIsValid) {
+      setIsLoading(true)
+      setHasError(false)
+      try {
+        const db = firebase.firestore()
+        await db.collection("users").add({
+          email,
+        })
+        setIsDone(true)
+      } catch (e) {
+        console.log("error", e)
+        setHasError(true)
+      }
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }
   return (
     <div className="App">
@@ -66,9 +69,7 @@ const App = () => {
                 />
                 <button
                   onClick={submit}
-                  className={
-                    isLoading || !re.test(email) ? "loading-button" : ""
-                  }
+                  className={isLoading || !emailIsValid ? "loading-button" : ""}
                 >
                   ENTER
                 </button>
