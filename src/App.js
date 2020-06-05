@@ -1,77 +1,24 @@
-import React, { useState } from "react"
-import tomNook from "./tom-nook.png"
+import React from "react"
 import "./App.css"
-import axios from "axios"
+import { SignUp } from "./pages/signup"
+import { Unsubscribe } from "./pages/unsubscribe"
 
-const re = /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i
+const getURLParams = () =>
+  window.location.search
+    ? JSON.parse(
+        '{"' +
+          decodeURI(window.location.search.substring(1))
+            .replace(/"/g, '\\"')
+            .replace(/&/g, '","')
+            .replace(/=/g, '":"') +
+          '"}'
+      )
+    : null
 
 const App = () => {
-  const [email, setEmail] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [isDone, setIsDone] = useState(false)
-  const [hasError, setHasError] = useState(false)
-  const emailIsValid = re.test(email)
-  const submit = async () => {
-    if (emailIsValid) {
-      setIsLoading(true)
-      setHasError(false)
-      try {
-        await axios.post(
-          "https://buy-switch-scrapper.herokuapp.com/emails",
-          { email },
-          { headers: { "Content-Type": "application/json" } }
-        )
-        setIsDone(true)
-      } catch (e) {
-        console.log("error", e)
-        setHasError(true)
-      }
-      setIsLoading(false)
-    }
-  }
-  return (
-    <div className="App">
-      <header className="App-header">
-        <div className="form-container">
-          {isDone ? (
-            <>
-              <h1>THANKS FOR SIGNING UP</h1>
-            </>
-          ) : (
-            <>
-              <h1>SIGN UP FOR EMAILS</h1>
-              <div className="input-container">
-                <input
-                  value={email}
-                  onChange={(event) => {
-                    setHasError(false)
-                    setEmail(event.target.value)
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.keyCode === 13) {
-                      submit()
-                    }
-                  }}
-                />
-                <button
-                  onClick={submit}
-                  className={isLoading || !emailIsValid ? "loading-button" : ""}
-                >
-                  ENTER
-                </button>
-              </div>
-              {hasError && <p>oh no! something went wrong! please try again</p>}
-            </>
-          )}
-        </div>
-      </header>
-      <img src={tomNook} className="tom-nook" />
-      <div className="wave-container">
-        <div className="wave"></div>
-        <div className="wave-bottom"></div>
-      </div>
-    </div>
-  )
+  console.log(getURLParams())
+  const URLParams = getURLParams()
+  return URLParams && URLParams.email ? <Unsubscribe /> : <SignUp />
 }
 
 export default App
